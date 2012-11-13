@@ -1,7 +1,10 @@
 function check(tabId, changeInfo, tab) {
-  //if (tab.url.indexOf('github.com') > -1) {
+  user = tab.url.split("/")[3]
+  repo = tab.url.split("/")[4]
+
+  if (tab.url.indexOf('github.com/') > -1 && user && repo) {
     chrome.pageAction.show(tabId);
-  //}
+  }
 }
 
 chrome.tabs.onUpdated.addListener(check);
