@@ -4,19 +4,42 @@
 
   tree = {
     init: function() {
-      return tree.fetch("thmzlt", "github-tree", "", function(responseData) {
-        var node, _i, _len, _results;
-        _results = [];
+      return tree.fetch("thmzlt", "tones", "", function(responseData) {
+        var node, _i, _len;
         for (_i = 0, _len = responseData.length; _i < _len; _i++) {
           node = responseData[_i];
-          _results.push($("#root").append(tree.nodeTag(node)));
+          $("#root").append(tree.nodeTag(node));
         }
-        return _results;
+        $("#root").on("click", "a.file", function() {
+          return chrome.tabs.update({
+            url: $(this).attr("href")
+          });
+        });
+        return $("#root").on("click", "a.dir", function() {
+          var el, url;
+          el = $(this);
+          if (el.attr("state") === "open") {
+            el.attr("state", "closed");
+            return el.parent().children("div").remove();
+          } else {
+            el.attr("state", "open");
+            url = el.attr("href");
+            return tree.fetchContents(url, function(data) {
+              var _j, _len1, _results;
+              _results = [];
+              for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
+                node = data[_j];
+                _results.push(el.parent().append(tree.nodeTag(node)));
+              }
+              return _results;
+            });
+          }
+        });
       });
     },
     nodeTag: function(node) {
       var out;
-      return out = "<div class=\"node " + node.type + "\">\n  <a href=\"" + node.url + "\" class=\"" + node.type + "\">" + node.name + "</a>\n</div>";
+      return out = "<div class=\"node " + node.type + "\">\n  <a href=\"" + (node.type === "dir" ? node.url : node.html_url) + "\" class=\"" + node.type + "\">" + node.name + "</a>\n</div>";
     },
     nodeTree: function(data) {
       var node, out, _i, _len;
@@ -26,6 +49,12 @@
         out += nodeTag(node);
       }
       return out;
+    },
+    fetchContents: function(url, callback) {
+      var results;
+      return results = $.getJSON(url, function(data) {
+        return callback(data);
+      });
     },
     fetch: function(owner, repo, path, callback) {
       var results;
