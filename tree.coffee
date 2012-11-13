@@ -2,23 +2,27 @@
 
 tree =
   init: () ->
-    tree.fetch "thmzlt", "tones", "", (responseData) ->
-      $("#root").append tree.nodeTag(node) for node in responseData
+    chrome.tabs.getSelected null, (tab) ->
+      user = tab.url.split("/")[3]
+      repo = tab.url.split("/")[4]
 
-      $("#root").on "click", "a.file", ->
-        chrome.tabs.update({url: $(this).attr("href")})
+      tree.fetchRoot user, repo, (responseData) ->
+        $("#root").append tree.nodeTag(node) for node in responseData
 
-      $("#root").on "click", "a.dir", ->
-        el = $(this)
+    $("#root").on "click", "a.file", ->
+      chrome.tabs.update({url: $(this).attr("href")})
 
-        if el.attr("state") is "open"
-          el.attr("state", "closed")
-          el.parent().children("div").remove()
-        else
-          el.attr("state", "open")
-          url = el.attr("href")
-          tree.fetchContents url, (data) ->
-            el.parent().append tree.nodeTag(node) for node in data
+    $("#root").on "click", "a.dir", ->
+      el = $(this)
+
+      if el.attr("state") is "open"
+        el.attr("state", "closed")
+        el.parent().children("div").remove()
+      else
+        el.attr("state", "open")
+        url = el.attr("href")
+        tree.fetchContents url, (data) ->
+          el.parent().append tree.nodeTag(node) for node in data
 
   nodeTag: (node) ->
     out = """
@@ -31,12 +35,12 @@ tree =
     out += nodeTag(node) for node in data
     out
 
-  fetchContents: (url, callback) ->
-    results = $.getJSON url, (data) ->
+  fetchRoot: (owner, repo, callback) ->
+    results = $.getJSON "https://api.github.com/repos/#{owner}/#{repo}/contents", (data) ->
       callback(data)
 
-  fetch: (owner, repo, path, callback) ->
-    results = $.getJSON "https://api.github.com/repos/#{owner}/#{repo}/contents/#{path}", (data) ->
+  fetchContents: (url, callback) ->
+    results = $.getJSON url, (data) ->
       callback(data)
 
 $ ->

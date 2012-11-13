@@ -4,37 +4,44 @@
 
   tree = {
     init: function() {
-      return tree.fetch("thmzlt", "tones", "", function(responseData) {
-        var node, _i, _len;
-        for (_i = 0, _len = responseData.length; _i < _len; _i++) {
-          node = responseData[_i];
-          $("#root").append(tree.nodeTag(node));
-        }
-        $("#root").on("click", "a.file", function() {
-          return chrome.tabs.update({
-            url: $(this).attr("href")
-          });
-        });
-        return $("#root").on("click", "a.dir", function() {
-          var el, url;
-          el = $(this);
-          if (el.attr("state") === "open") {
-            el.attr("state", "closed");
-            return el.parent().children("div").remove();
-          } else {
-            el.attr("state", "open");
-            url = el.attr("href");
-            return tree.fetchContents(url, function(data) {
-              var _j, _len1, _results;
-              _results = [];
-              for (_j = 0, _len1 = data.length; _j < _len1; _j++) {
-                node = data[_j];
-                _results.push(el.parent().append(tree.nodeTag(node)));
-              }
-              return _results;
-            });
+      chrome.tabs.getSelected(null, function(tab) {
+        var repo, user;
+        user = tab.url.split("/")[3];
+        repo = tab.url.split("/")[4];
+        return tree.fetchRoot(user, repo, function(responseData) {
+          var node, _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = responseData.length; _i < _len; _i++) {
+            node = responseData[_i];
+            _results.push($("#root").append(tree.nodeTag(node)));
           }
+          return _results;
         });
+      });
+      $("#root").on("click", "a.file", function() {
+        return chrome.tabs.update({
+          url: $(this).attr("href")
+        });
+      });
+      return $("#root").on("click", "a.dir", function() {
+        var el, url;
+        el = $(this);
+        if (el.attr("state") === "open") {
+          el.attr("state", "closed");
+          return el.parent().children("div").remove();
+        } else {
+          el.attr("state", "open");
+          url = el.attr("href");
+          return tree.fetchContents(url, function(data) {
+            var node, _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = data.length; _i < _len; _i++) {
+              node = data[_i];
+              _results.push(el.parent().append(tree.nodeTag(node)));
+            }
+            return _results;
+          });
+        }
       });
     },
     nodeTag: function(node) {
@@ -50,15 +57,15 @@
       }
       return out;
     },
-    fetchContents: function(url, callback) {
+    fetchRoot: function(owner, repo, callback) {
       var results;
-      return results = $.getJSON(url, function(data) {
+      return results = $.getJSON("https://api.github.com/repos/" + owner + "/" + repo + "/contents", function(data) {
         return callback(data);
       });
     },
-    fetch: function(owner, repo, path, callback) {
+    fetchContents: function(url, callback) {
       var results;
-      return results = $.getJSON("https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path, function(data) {
+      return results = $.getJSON(url, function(data) {
         return callback(data);
       });
     }
