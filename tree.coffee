@@ -1,5 +1,3 @@
-# tree.init() is called as a $(document).ready() callback
-
 tree =
   init: () ->
     chrome.tabs.getSelected null, (tab) ->
