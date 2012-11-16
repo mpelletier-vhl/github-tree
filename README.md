@@ -1,7 +1,9 @@
-# github-tree
+# GitHub Tree
 
-This chrome extension will give you a very basic directory tree for your repo.
+This chrome extension will give you a very basic directory tree for a GitHub repository.
 
-You probably want to run this on development:
+## Development
+
+To have `.coffee` files compiled automatically for you, run:
 
     coffee -w -c *.coffee
