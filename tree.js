@@ -8,6 +8,7 @@
         var repo, user;
         user = tab.url.split("/")[3];
         repo = tab.url.split("/")[4];
+        $(".repo-name").text("" + user + " / " + repo);
         return tree.fetchRoot(user, repo, function(responseData) {
           var node, _i, _len, _results;
           _results = [];
@@ -28,9 +29,11 @@
         el = $(this);
         if (el.attr("state") === "open") {
           el.attr("state", "closed");
+          el.prev().toggleClass("icon-folder-open icon-folder-close");
           return el.parent().children("div").remove();
         } else {
           el.attr("state", "open");
+          el.prev().toggleClass("icon-folder-open icon-folder-close");
           url = el.attr("href");
           return tree.fetchContents(url, function(data) {
             var node, _i, _len, _results;
@@ -45,8 +48,10 @@
       });
     },
     nodeTag: function(node) {
-      var out;
-      return out = "<div class=\"node " + node.type + "\">\n  <a href=\"" + (node.type === "dir" ? node.url : node.html_url) + "\" class=\"" + node.type + "\">" + node.name + "</a>\n</div>";
+      var icon, out, url;
+      icon = node.type === "dir" ? "icon-folder-close" : "icon-file";
+      url = node.type === "dir" ? node.url : node.html_url;
+      return out = "<div class=\"node " + node.type + "\">\n  <i class=\"" + icon + "\"></i>\n  <a href=\"" + url + "\" class=\"" + node.type + "\">" + node.name + "</a>\n</div>";
     },
     nodeTree: function(data) {
       var node, out, _i, _len;

@@ -4,6 +4,8 @@ tree =
       user = tab.url.split("/")[3]
       repo = tab.url.split("/")[4]
 
+      $(".repo-name").text("#{user} / #{repo}")
+
       tree.fetchRoot user, repo, (responseData) ->
         $("#root").append tree.nodeTag(node) for node in responseData
 
@@ -15,17 +17,22 @@ tree =
 
       if el.attr("state") is "open"
         el.attr("state", "closed")
+        el.prev().toggleClass("icon-folder-open icon-folder-close")
         el.parent().children("div").remove()
       else
         el.attr("state", "open")
+        el.prev().toggleClass("icon-folder-open icon-folder-close")
         url = el.attr("href")
         tree.fetchContents url, (data) ->
           el.parent().append tree.nodeTag(node) for node in data
 
   nodeTag: (node) ->
+    icon = if node.type is "dir" then "icon-folder-close" else "icon-file"
+    url = if node.type is "dir" then node.url else node.html_url
     out = """
           <div class="node #{node.type}">
-            <a href="#{if node.type is "dir" then node.url else node.html_url}" class="#{node.type}">#{node.name}</a>
+            <i class="#{icon}"></i>
+            <a href="#{url}" class="#{node.type}">#{node.name}</a>
           </div>
           """
   nodeTree: (data) ->
