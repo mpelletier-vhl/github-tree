@@ -1,4 +1,3 @@
-
 tree =
   init: () ->
     chrome.tabs.getSelected null, (tab) ->
