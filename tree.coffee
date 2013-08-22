@@ -3,10 +3,11 @@ tree =
     chrome.tabs.getSelected null, (tab) ->
       user = tab.url.split("/")[3]
       repo = tab.url.split("/")[4]
+      ref = tree.ref tab.url
 
       $(".repo-name").text("#{user} / #{repo}")
 
-      tree.fetchRoot user, repo, (responseData) ->
+      tree.fetchRoot user, repo, ref, (responseData) ->
         $("#root").append tree.nodeTag(node) for node in responseData
 
     $("#root").on "click", "a.file", ->
@@ -26,6 +27,12 @@ tree =
         tree.fetchContents url, (data) ->
           el.parent().append tree.nodeTag(node) for node in data
 
+  ref: (url) ->
+    if url.split("/").length > 7
+      url.split("/")[6]
+    else
+      'master'
+
   nodeTag: (node) ->
     icon = if node.type is "dir" then "icon-folder-close" else "icon-file"
     url = if node.type is "dir" then node.url else node.html_url
@@ -40,8 +47,8 @@ tree =
     out += nodeTag(node) for node in data
     out
 
-  fetchRoot: (owner, repo, callback) ->
-    results = $.getJSON "https://api.github.com/repos/#{owner}/#{repo}/contents", (data) ->
+  fetchRoot: (owner, repo, ref, callback) ->
+    results = $.getJSON "https://api.github.com/repos/#{owner}/#{repo}/contents?ref=#{ref}", (data) ->
       callback(data)
 
   fetchContents: (url, callback) ->
