@@ -1,11 +1,20 @@
 {
   "manifest_version": 2,
   "name": "GitHub Tree",
-  "version": "0.3",
+  "version": "0.4",
   "description": "A directory tree for GitHub projects.",
 
   "permissions": ["tabs"],
   "background": { "scripts": ["background.js"] },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.github.com/*/*/*"],
+     // "css": ["ghpr.css"],
+      "js": [ "js/jquery.js", "js/oauth.js", "js/init.js"],
+      "run_at": "document_end"
+    }
+  ],
 
   "page_action": {
     "default_icon": "icon.png",
