@@ -6,16 +6,13 @@
 
   "permissions": ["tabs"],
   "background": { "scripts": ["js/background.js"] },
-
   "content_scripts": [
     {
-      "matches": ["*://*.github.com/*/*/*"],
-     // "css": ["ghpr.css"],
+      "matches": ["*://*.github.com/*/*"],
       "js": [ "js/jquery.js", "js/oauth.js", "js/init.js"],
       "run_at": "document_end"
     }
   ],
-
   "page_action": {
     "default_icon": "icon.png",
     "default_title": "GitHub Tree",
