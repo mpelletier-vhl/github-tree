@@ -36,6 +36,8 @@
           el.attr("state", "open");
           el.prev().toggleClass("icon-folder-open icon-folder-close");
           url = el.attr("href");
+          var auth = chrome.extension.getBackgroundPage().access_key;
+          url = url + "&access_token=" + auth;
           return tree.fetchContents(url, function(data) {
             var node, _i, _len, _results;
             _results = [];
@@ -72,7 +74,8 @@
     },
     fetchRoot: function(owner, repo, ref, callback) {
       var results;
-      return results = $.getJSON("https://api.github.com/repos/" + owner + "/" + repo + "/contents?ref=" + ref, function(data) {
+      var auth = chrome.extension.getBackgroundPage().access_key;
+      return results = $.getJSON("https://api.github.com/repos/" + owner + "/" + repo + "/contents?ref=" + ref + "&access_token=" + auth, function(data) {
         return callback(data);
       });
     },
